@@ -7,4 +7,4 @@ redis-cli --cluster create master1ip:6379 master2ip:6379 master3ip:6379 slave1ip
 
 Check кластера:
 
-redis-cli -c -h 10.0.1.4 -p 6379 cluster nodes
+redis-cli -c -h 172.0.0.1 -p 6379 cluster nodes
