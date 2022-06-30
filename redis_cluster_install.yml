@@ -1,0 +1,128 @@
+---
+- name: Redis Cluster Install
+  hosts: redis
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:
+
+    - name: Download redis.rpm file
+      get_url:
+        url: https://rpmfind.net/linux/remi/enterprise/7/remi/x86_64/redis-6.0.9-2.el7.remi.x86_64.rpm
+        dest: /home/yakup
+        mode: '0644'
+
+    - name: install redis
+      yum:
+        name: /home/yakup/redis-6.0.9-2.el7.remi.x86_64.rpm
+        state: present
+
+    - name: stop firewall service
+      service:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - name: Swappoff disable
+      command: swapoff -a
+      ignore_errors: yes
+
+    - name: Disable SELinux
+      selinux:
+        state: disabled
+
+    - name: Redis.conf backup 
+      command: mv /etc/redis.conf /etc/redis_backup.conf
+
+    - name: Download redis.rpm file
+      get_url:
+        url: https://raw.githubusercontent.com/aytemuryakup/ansible/master/Redis/redis.conf
+        dest: /etc/
+        mode: '0755'
+
+- name: Redis Cluster Install
+  hosts: r1
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind master1'
+
+- name: Redis Cluster Install
+  hosts: r2
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind master2'
+
+- name: Redis Cluster Install
+  hosts: r3
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind master3'
+
+- name: Redis Cluster Install
+  hosts: r4
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind slave1'
+
+- name: Redis Cluster Install
+  hosts: r5
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind slave2'
+
+- name: Redis Cluster Install
+  hosts: r6
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:  
+     - name: Insert configuration bind section
+       lineinfile:
+        path: /etc/redis.conf
+        regexp: 'bind 127.0.0.1'
+        line: 'bind slave3'
+
+- name: Start redis.service
+  hosts: redis
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:
+
+    - name: Restart for all server
+      reboot:
+
+     - name: Start redis service
+       service:
+         name: redis
+         state: started
